@@ -32,6 +32,8 @@ jobs:
         TF_VAR_region: "us-east-2"  # Replace with your desired region
       run: |
         cat /etc/os-release
+        ls -tal 
+        ls .github/workflows/
         terraform init
         
     - name: Apply Terraform configuration
