@@ -2,16 +2,6 @@ name: Launch EC2 Instance
 
 on:
   workflow_dispatch: 
-    inputs:
-      aws_access_key_id:
-        description: 'AWS Access Key ID'
-        required: true
-      aws_secret_access_key:
-        description: 'AWS Secret Access Key'
-        required: true
-      region:
-        description: 'AWS Region'
-        required: true
 
 jobs:
   launch_ec2:
@@ -21,10 +11,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       
-    - name: Set up AWS credentials
+    - name: Set up AWS credentials from GitHub Secrets
       run: |
-        echo "aws_access_key_id=${{ github.event.inputs.aws_access_key_id }}" >> $GITHUB_ENV
-        echo "aws_secret_access_key=${{ github.event.inputs.aws_secret_access_key }}" >> $GITHUB_ENV
+        echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+        echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
 
     - name: Install required tools
       run: |
@@ -33,13 +23,13 @@ jobs:
         
     - name: Configure AWS CLI
       run: |
-        aws configure set region "${{ github.event.inputs.region }}"
-        
+        aws configure set region "us-west-2"  # Replace with your desired region
+
     - name: Run Terraform init
       env:
         TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
         TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
-        TF_VAR_region: ${{ github.event.inputs.region }}
+        TF_VAR_region: "us-west-2"  # Replace with your desired region
       run: |
         terraform init
         
@@ -47,7 +37,7 @@ jobs:
       env:
         TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
         TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
-        TF_VAR_region: ${{ github.event.inputs.region }}
+        TF_VAR_region: "us-west-2"  # Replace with your desired region
       run: |
         terraform apply -auto-approve
         
@@ -55,7 +45,7 @@ jobs:
       env:
         TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
         TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
-        TF_VAR_region: ${{ github.event.inputs.region }}
+        TF_VAR_region: "us-west-2"  # Replace with your desired region
       run: |
         terraform show -json
         
@@ -63,6 +53,6 @@ jobs:
       env:
         TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
         TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
-        TF_VAR_region: ${{ github.event.inputs.region }}
+        TF_VAR_region: "us-west-2"  # Replace with your desired region
       run: |
         terraform destroy -auto-approve
