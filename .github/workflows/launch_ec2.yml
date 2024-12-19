@@ -18,8 +18,8 @@ jobs:
 
     - name: Install required tools
       run: |
-        apt-get update
-        apt-get install -y unzip gnupg software-properties-common gpg wget
+        sudo apt-get update
+        sudo apt-get install -y unzip gnupg software-properties-common gpg wget
 
     - name: Configure AWS CLI
       run: |
