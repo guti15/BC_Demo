@@ -1,0 +1,68 @@
+name: Launch EC2 Instance
+
+on:
+  workflow_dispatch: 
+    inputs:
+      aws_access_key_id:
+        description: 'AWS Access Key ID'
+        required: true
+      aws_secret_access_key:
+        description: 'AWS Secret Access Key'
+        required: true
+      region:
+        description: 'AWS Region'
+        required: true
+
+jobs:
+  launch_ec2:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up AWS credentials
+      run: |
+        echo "aws_access_key_id=${{ github.event.inputs.aws_access_key_id }}" >> $GITHUB_ENV
+        echo "aws_secret_access_key=${{ github.event.inputs.aws_secret_access_key }}" >> $GITHUB_ENV
+
+    - name: Install required tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli terraform
+        
+    - name: Configure AWS CLI
+      run: |
+        aws configure set region "${{ github.event.inputs.region }}"
+        
+    - name: Run Terraform init
+      env:
+        TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
+        TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
+        TF_VAR_region: ${{ github.event.inputs.region }}
+      run: |
+        terraform init
+        
+    - name: Apply Terraform configuration
+      env:
+        TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
+        TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
+        TF_VAR_region: ${{ github.event.inputs.region }}
+      run: |
+        terraform apply -auto-approve
+        
+    - name: Log Terraform output
+      env:
+        TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
+        TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
+        TF_VAR_region: ${{ github.event.inputs.region }}
+      run: |
+        terraform show -json
+        
+    - name: Clean up Terraform state
+      env:
+        TF_VAR_aws_access_key_id: ${{ env.aws_access_key_id }}
+        TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
+        TF_VAR_region: ${{ github.event.inputs.region }}
+      run: |
+        terraform destroy -auto-approve
