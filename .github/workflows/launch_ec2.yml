@@ -5,7 +5,7 @@ on:
 
 jobs:
   launch_ec2:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     steps:
     - name: Checkout code
@@ -18,8 +18,8 @@ jobs:
 
     - name: Install required tools
       run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip gnupg software-properties-common gpg wget
+        apt-get update
+        apt-get install -y unzip gnupg software-properties-common gpg wget
 
     - name: Configure AWS CLI
       run: |
@@ -31,6 +31,7 @@ jobs:
         TF_VAR_aws_secret_access_key: ${{ env.aws_secret_access_key }}
         TF_VAR_region: "us-east-2"  # Replace with your desired region
       run: |
+        cat /etc/os-release
         terraform init
         
     - name: Apply Terraform configuration
