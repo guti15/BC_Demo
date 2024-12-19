@@ -18,12 +18,12 @@ jobs:
 
     - name: Install required tools
       run: |
-        sudo apt-get update
-        sudo apt-get install -y awscli terraform
-        
+        apt-get update
+        apt-get unzip gnupg software-properties-common gpg wget
+
     - name: Configure AWS CLI
       run: |
-        aws configure set region "us-west-2"  # Replace with your desired region
+        aws configure set region "us-east-2"  # Replace with your desired region
 
     - name: Run Terraform init
       env:
