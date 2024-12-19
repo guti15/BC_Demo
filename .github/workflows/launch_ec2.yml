@@ -42,7 +42,7 @@ jobs:
       run: |
         ls
         pwd
-        terraform apply -auto-approve main.tf
+        terraform apply -auto-approve .github/workflows/main.tf
         
     - name: Log Terraform output
       env:
