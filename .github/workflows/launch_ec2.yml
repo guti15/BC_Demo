@@ -26,27 +26,26 @@ jobs:
         aws configure set region "us-east-2"  # Replace with your desired region
 
     - name: Run Terraform init
+      working-directory:  "./.github/workflows"
       # env:
       #   TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
       #   TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
       #   TF_VAR_region: "us-east-2"  # Replace with your desired region
       run: |
         cd .github/workflows
-        ls -tal
-        cat main.tf
         terraform init
         
     - name: Apply Terraform configuration
+      working-directory:  "./.github/workflows"
       env:
         TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
         TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
         TF_VAR_region: "us-east-2"  # Replace with your desired region
       run: |
-        ls
-        pwd
-        terraform apply -auto-approve .github/workflows/main.tf
+        terraform apply -auto-approve 
         
     - name: Log Terraform output
+      working-directory:  "./.github/workflows"
       env:
         TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
         TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
@@ -55,6 +54,7 @@ jobs:
         terraform show -json
         
     - name: Clean up Terraform state
+      working-directory:  "./.github/workflows"
       env:
         TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
         TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
