@@ -27,10 +27,10 @@ jobs:
 
     - name: Run Terraform init
       working-directory:  "./.github/workflows"
-      # env:
-      #   TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
-      #   TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
-      #   TF_VAR_region: "us-east-2"  # Replace with your desired region
+      env:
+        TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
+        TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
+        TF_VAR_region: "us-east-2"  # Replace with your desired region
       run: |
         terraform init
         
