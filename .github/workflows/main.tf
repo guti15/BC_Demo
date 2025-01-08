@@ -10,8 +10,10 @@ resource "aws_instance" "bc_demo" {
 
   tags = {
     test = "True"
+    Environment = "dev"
+    Project     = "BC_Demo"
+    Branch = var.branch_name
   }
-
   user_data = <<-EOF
               #!/bin/bash
               yum update -y

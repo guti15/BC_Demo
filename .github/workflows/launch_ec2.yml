@@ -3,6 +3,9 @@ name: Launch EC2 Instance
 on:
   workflow_dispatch: 
 
+env:
+BRANCH_NAME: ${{ github.ref_name }}
+
 jobs:
   launch_ec2:
     runs-on: ubuntu-22.04
@@ -21,44 +24,60 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y unzip gnupg software-properties-common gpg wget
 
-    - name: Configure AWS CLI
-      run: |
-        aws configure set region "us-east-2"  # Replace with your desired region
+         - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Run Terraform init
-      working-directory:  "./.github/workflows"
-      env:
-        TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
-        TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
-        TF_VAR_region: "us-east-2"  # Replace with your desired region
-      run: |
-        terraform init
-        
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: Initialize Terraform
+      run: terraform init
+
+    - name: Plan Terraform configuration
+      id: plan
+      run: terraform plan -out=tfplan
+
     - name: Apply Terraform configuration
-      working-directory:  "./.github/workflows"
-      env:
-        TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
-        TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
-        TF_VAR_region: "us-east-2"  # Replace with your desired region
-      run: |
-        terraform fmt
-        terraform validate  
-        terraform apply -auto-approve 
+      run: terraform apply tfplan -var "branch_name=${{ env.BRANCH_NAME }}"
         
-    - name: Log Terraform output
-      working-directory:  "./.github/workflows"
-      env:
-        TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
-        TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
-        TF_VAR_region: "us-east-2"  # Replace with your desired region
-      run: |
-        terraform show -json
+    # - name: Configure AWS CLI
+    #   run: |
+    #     aws configure set region "us-east-2"  # Replace with your desired region
+
+    # - name: Run Terraform init
+    #   working-directory:  "./.github/workflows"
+    #   env:
+    #     TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
+    #     TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
+    #     TF_VAR_region: "us-east-2"  # Replace with your desired region
+    #   run: |
+    #     terraform init
         
-    - name: Clean up Terraform state
-      working-directory:  "./.github/workflows"
-      env:
-        TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
-        TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
-        TF_VAR_region: "us-east-2"  # Replace with your desired region
-      run: |
-        terraform destroy -auto-approve
+    # - name: Apply Terraform configuration
+    #   working-directory:  "./.github/workflows"
+    #   env:
+    #     TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
+    #     TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
+    #     TF_VAR_region: "us-east-2"  # Replace with your desired region
+    #   run: |
+    #     terraform fmt
+    #     terraform validate  
+    #     terraform apply -auto-approve 
+        
+    # - name: Log Terraform output
+    #   working-directory:  "./.github/workflows"
+    #   env:
+    #     TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
+    #     TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
+    #     TF_VAR_region: "us-east-2"  # Replace with your desired region
+    #   run: |
+    #     terraform show -json
+        
+    # - name: Clean up Terraform state
+    #   working-directory:  "./.github/workflows"
+    #   env:
+    #     TF_VAR_aws_access_key_id: ${{ secrets.TF_USER_AWS_KEY }}
+    #     TF_VAR_aws_secret_access_key: ${{ secrets.TF_USER_AWS_SECRET }}
+    #     TF_VAR_region: "us-east-2"  # Replace with your desired region
+    #   run: |
+    #     terraform destroy -auto-approve
