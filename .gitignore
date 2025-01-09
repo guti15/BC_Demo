@@ -1,5 +1,6 @@
 nohup.out
 notes.txt
+.env
 terraform.lock.hcl
 terraform.tfstate
 .terraform*
